@@ -716,6 +716,94 @@ const HTML_PAGE = `
             flex: 1;
             min-width: 140px;
         }
+
+        /* API Key 配置样式 */
+        .api-config {
+            position: fixed;
+            top: 20px;
+            right: 160px; /* 位于语言切换器左侧 */
+            z-index: 1000;
+        }
+
+        .api-key-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .api-key-btn:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .api-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .api-modal.show {
+            display: flex;
+        }
+
+        .api-modal-content {
+            background: var(--surface-color);
+            border-radius: var(--radius-xl);
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .api-modal-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .api-modal-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .api-modal-close {
+            border: none;
+            background: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .api-config {
+                top: 20px;
+                right: auto;
+                left: 20px;
+            }
+        }
         
         /* 语言切换器样式 */
         .language-switcher {
@@ -936,6 +1024,30 @@ const HTML_PAGE = `
                 <span>🇷🇺</span>
                 <span data-i18n="lang.ru">Русский</span>
             </div>
+        </div>
+    </div>
+
+    <!-- API Key 配置 -->
+    <div class="api-config">
+        <button class="api-key-btn" id="apiKeyBtn">
+            <span id="apiKeyStatusIcon">🔑</span>
+            <span id="apiKeyBtnText" data-i18n="api.config">API Key</span>
+        </button>
+    </div>
+
+    <!-- API Key 模态框 -->
+    <div class="api-modal" id="apiModal">
+        <div class="api-modal-content">
+            <div class="api-modal-header">
+                <h3 data-i18n="api.modalTitle">API Configuration</h3>
+                <button class="api-modal-close" id="apiModalClose">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="userApiKey" data-i18n="api.label">Enter your API Key</label>
+                <input type="password" class="form-input" id="userApiKey" placeholder="Your API Key">
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 8px;" data-i18n="api.hint">This key will be stored locally and used for all requests.</p>
+            </div>
+            <button class="btn-primary" id="saveApiKeyBtn" data-i18n="api.save">Save Configuration</button>
         </div>
     </div>
 
@@ -1287,7 +1399,12 @@ const HTML_PAGE = `
                 'header.feature3': 'Completely Free',
                 'header.feature4': 'Download Support',
                 'mode.tts': 'Text to Speech',
-                'mode.transcription': 'Speech to Text'
+                'mode.transcription': 'Speech to Text',
+                'api.config': 'API Key',
+                'api.modalTitle': 'API Configuration',
+                'api.label': 'Access Key (API_KEY)',
+                'api.hint': 'Required for API access. Stored in browser.',
+                'api.save': 'Save Key'
             },
             zh: {
                 'page.title': 'VoiceCraft - AI驱动的语音处理平台',
@@ -1309,7 +1426,12 @@ const HTML_PAGE = `
                 'header.feature3': '完全免费',
                 'header.feature4': '支持下载',
                 'mode.tts': '文字转语音',
-                'mode.transcription': '语音转文字'
+                'mode.transcription': '语音转文字',
+                'api.config': 'API 密钥',
+                'api.modalTitle': 'API 访问配置',
+                'api.label': '访问密钥 (API_KEY)',
+                'api.hint': '防卫任意调用，密钥保存在本地浏览器中。',
+                'api.save': '保存配置'
             },
             ja: {
                 'page.title': 'VoiceCraft - AI音声処理プラットフォーム',
@@ -1536,7 +1658,59 @@ const HTML_PAGE = `
             initializeAudioUpload();
             initializeTokenConfig();
             initializeLanguageSwitcher();
+            initializeApiKeyConfig();
         });
+
+        // 初始化 API Key 配置
+        function initializeApiKeyConfig() {
+            const apiKeyBtn = document.getElementById('apiKeyBtn');
+            const apiModal = document.getElementById('apiModal');
+            const apiModalClose = document.getElementById('apiModalClose');
+            const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
+            const userApiKeyInput = document.getElementById('userApiKey');
+            const apiKeyStatusIcon = document.getElementById('apiKeyStatusIcon');
+
+            // 从本地加载 Key
+            const savedKey = localStorage.getItem('voicecraft-api-key');
+            if (savedKey) {
+                userApiKeyInput.value = savedKey;
+                apiKeyStatusIcon.textContent = '🔒';
+            }
+
+            apiKeyBtn.addEventListener('click', () => {
+                apiModal.classList.add('show');
+            });
+
+            apiModalClose.addEventListener('click', () => {
+                apiModal.classList.remove('show');
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === apiModal) {
+                    apiModal.classList.remove('show');
+                }
+            });
+
+            saveApiKeyBtn.addEventListener('click', () => {
+                const key = userApiKeyInput.value.trim();
+                if (key) {
+                    localStorage.setItem('voicecraft-api-key', key);
+                    apiKeyStatusIcon.textContent = '🔒';
+                } else {
+                    localStorage.removeItem('voicecraft-api-key');
+                    apiKeyStatusIcon.textContent = '🔑';
+                }
+                apiModal.classList.remove('show');
+                
+                // 给个成功提示
+                alert(currentLanguage === 'zh' ? '配置已保存' : 'Settings saved');
+            });
+        }
+
+        // 获取当前 API Key 的辅助函数
+        function getStoredApiKey() {
+            return localStorage.getItem('voicecraft-api-key') || '';
+        }
 
         // 初始化输入方式切换
         function initializeInputMethodTabs() {
@@ -1708,6 +1882,7 @@ const HTML_PAGE = `
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'x-api-key': getStoredApiKey()
                         },
                         body: JSON.stringify({
                             input: text,
@@ -1731,6 +1906,9 @@ const HTML_PAGE = `
                     
                     response = await fetch('/v1/audio/speech', {
                         method: 'POST',
+                        headers: {
+                            'x-api-key': getStoredApiKey()
+                        },
                         body: formData
                     });
                 }
@@ -1975,6 +2153,9 @@ const HTML_PAGE = `
                 
                 const response = await fetch('/v1/audio/transcriptions', {
                     method: 'POST',
+                    headers: {
+                        'x-api-key': getStoredApiKey()
+                    },
                     body: formData
                 });
                 
@@ -2103,11 +2284,40 @@ const HTML_PAGE = `
 
 export default {
     async fetch(request, env, ctx) {
-        return handleRequest(request);
+        return handleRequest(request, env);
     }
 };
 
-async function handleRequest(request) {
+/**
+ * 校验 API Key
+ * @param {Request} request 
+ * @param {Env} env 
+ * @returns {boolean}
+ */
+function checkAuth(request, env) {
+    // 如果没有设置 API_KEY，则默认不开启校验（或根据需求决定）
+    if (!env || !env.API_KEY) {
+        return true;
+    }
+
+    const authHeader = request.headers.get("Authorization");
+    const xApiKey = request.headers.get("x-api-key");
+    
+    // 支持 Bearer Token 格式
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+        const token = authHeader.substring(7);
+        if (token === env.API_KEY) return true;
+    }
+
+    // 支持自定义请求头 x-api-key
+    if (xApiKey === env.API_KEY) {
+        return true;
+    }
+
+    return false;
+}
+
+async function handleRequest(request, env) {
     if (request.method === "OPTIONS") {
         return handleOptions(request);
     }
@@ -2126,6 +2336,26 @@ async function handleRequest(request) {
                 ...makeCORSHeaders()
             }
         });
+    }
+
+    // 鉴权拦截器：保护所有 /v1/ 开头的 API
+    if (path.startsWith("/v1/")) {
+        if (!checkAuth(request, env)) {
+            return new Response(JSON.stringify({
+                error: {
+                    message: "Unauthorized: Invalid or missing API Key",
+                    type: "auth_error",
+                    param: null,
+                    code: "unauthorized"
+                }
+            }), {
+                status: 401,
+                headers: {
+                    "Content-Type": "application/json",
+                    ...makeCORSHeaders()
+                }
+            });
+        }
     }
 
     if (path === "/v1/audio/transcriptions") {
