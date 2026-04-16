@@ -1164,27 +1164,59 @@ const HTML_PAGE = `
                         <div class="form-group">
                             <label class="form-label" for="voice">语音选择</label>
                             <select class="form-select" id="voice">
-                                <option value="zh-CN-XiaoxiaoNeural">晓晓 (女声·温柔)</option>
-                                <option value="zh-CN-YunxiNeural">云希 (男声·清朗)</option>
-                                <option value="zh-CN-YunyangNeural">云扬 (男声·阳光)</option>
-                                <option value="zh-CN-XiaoyiNeural">晓伊 (女声·甜美)</option>
-                                <option value="zh-CN-YunjianNeural">云健 (男声·稳重)</option>
-                                <option value="zh-CN-XiaochenNeural">晓辰 (女声·知性)</option>
-                                <option value="zh-CN-XiaohanNeural">晓涵 (女声·优雅)</option>
-                                <option value="zh-CN-XiaomengNeural">晓梦 (女声·梦幻)</option>
-                                <option value="zh-CN-XiaomoNeural">晓墨 (女声·文艺)</option>
-                                <option value="zh-CN-XiaoqiuNeural">晓秋 (女声·成熟)</option>
-                                <option value="zh-CN-XiaoruiNeural">晓睿 (女声·智慧)</option>
-                                <option value="zh-CN-XiaoshuangNeural">晓双 (女声·活泼)</option>
-                                <option value="zh-CN-XiaoxuanNeural">晓萱 (女声·清新)</option>
-                                <option value="zh-CN-XiaoyanNeural">晓颜 (女声·柔美)</option>
-                                <option value="zh-CN-XiaoyouNeural">晓悠 (女声·悠扬)</option>
-                                <option value="zh-CN-XiaozhenNeural">晓甄 (女声·端庄)</option>
-                                <option value="zh-CN-YunfengNeural">云枫 (男声·磁性)</option>
-                                <option value="zh-CN-YunhaoNeural">云皓 (男声·豪迈)</option>
-                                <option value="zh-CN-YunxiaNeural">云夏 (男声·热情)</option>
-                                <option value="zh-CN-YunyeNeural">云野 (男声·野性)</option>
-                                <option value="zh-CN-YunzeNeural">云泽 (男声·深沉)</option>
+                                <optgroup label="中文 (Chinese)">
+                                    <option value="zh-CN-XiaoxiaoNeural">晓晓 (女声·温柔)</option>
+                                    <option value="zh-CN-YunxiNeural">云希 (男声·清朗)</option>
+                                    <option value="zh-CN-YunyangNeural">云扬 (男声·阳光)</option>
+                                    <option value="zh-CN-XiaoyiNeural">晓伊 (女声·甜美)</option>
+                                    <option value="zh-CN-YunjianNeural">云健 (男声·稳重)</option>
+                                    <option value="zh-CN-XiaochenNeural">晓辰 (女声·知性)</option>
+                                    <option value="zh-CN-XiaohanNeural">晓涵 (女声·优雅)</option>
+                                    <option value="zh-CN-XiaomengNeural">晓梦 (女声·梦幻)</option>
+                                    <option value="zh-CN-XiaomoNeural">晓墨 (女声·文艺)</option>
+                                    <option value="zh-CN-XiaoqiuNeural">晓秋 (女声·成熟)</option>
+                                    <option value="zh-CN-XiaoruiNeural">晓睿 (女声·智慧)</option>
+                                    <option value="zh-CN-XiaoshuangNeural">晓双 (女声·活泼)</option>
+                                    <option value="zh-CN-XiaoxuanNeural">晓萱 (女声·清新)</option>
+                                    <option value="zh-CN-XiaoyanNeural">晓颜 (女声·柔美)</option>
+                                    <option value="zh-CN-XiaoyouNeural">晓悠 (女声·悠扬)</option>
+                                    <option value="zh-CN-XiaozhenNeural">晓甄 (女声·端庄)</option>
+                                    <option value="zh-CN-YunfengNeural">云枫 (男声·磁性)</option>
+                                    <option value="zh-CN-YunhaoNeural">云皓 (男声·豪迈)</option>
+                                    <option value="zh-CN-YunxiaNeural">云夏 (男声·热情)</option>
+                                    <option value="zh-CN-YunyeNeural">云野 (男声·野性)</option>
+                                    <option value="zh-CN-YunzeNeural">云泽 (男声·深沉)</option>
+                                </optgroup>
+                                <optgroup label="英文 (English)">
+                                    <!-- US English -->
+                                    <option value="en-US-AvaNeural">Ava (US·女声·自然)</option>
+                                    <option value="en-US-AndrewNeural">Andrew (US·男声·自然)</option>
+                                    <option value="en-US-EmmaNeural">Emma (US·女声·专业)</option>
+                                    <option value="en-US-BrianNeural">Brian (US·男声·专业)</option>
+                                    <option value="en-US-JennyNeural">Jenny (US·女声·亲切)</option>
+                                    <option value="en-US-GuyNeural">Guy (US·男声·浑厚)</option>
+                                    <option value="en-US-AriaNeural">Aria (US·女声·知性)</option>
+                                    <option value="en-US-ChristopherNeural">Christopher (US·男声·阳光)</option>
+                                    <option value="en-US-EricNeural">Eric (US·男声·沉稳)</option>
+                                    <option value="en-US-MichelleNeural">Michelle (US·女声·活泼)</option>
+                                    <option value="en-US-RogerNeural">Roger (US·男声·严肃)</option>
+                                    
+                                    <!-- UK English -->
+                                    <option value="en-GB-SoniaNeural">Sonia (UK·女声·英伦)</option>
+                                    <option value="en-GB-RyanNeural">Ryan (UK·男声·英伦)</option>
+                                    <option value="en-GB-LibbyNeural">Libby (UK·女声·清澈)</option>
+                                    <option value="en-GB-ThomasNeural">Thomas (UK·男声·磁性)</option>
+                                    
+                                    <!-- Other English Regions -->
+                                    <option value="en-AU-NatashaNeural">Natasha (AU·女声·澳洲)</option>
+                                    <option value="en-AU-WilliamNeural">William (AU·男声·澳洲)</option>
+                                    <option value="en-CA-ClaraNeural">Clara (CA·女声·加拿大)</option>
+                                    <option value="en-CA-LiamNeural">Liam (CA·男声·加拿大)</option>
+                                    <option value="en-IN-NeerjaNeural">Neerja (IN·女声·印度)</option>
+                                    <option value="en-IN-PrabhatNeural">Prabhat (IN·男声·印度)</option>
+                                    <option value="en-IE-EmilyNeural">Emily (IE·女声·爱尔兰)</option>
+                                    <option value="en-IE-ConnorNeural">Connor (IE·男声·爱尔兰)</option>
+                                </optgroup>
                             </select>
                         </div>
                         
@@ -2701,11 +2733,19 @@ function getSsml(text, voiceName, rate, pitch, volume, style, slien = 0) {
     // 对文本进行XML转义
     const escapedText = escapeXmlText(text);
     
+    // 从 voiceName 提取语言代码 (例如: zh-CN-XiaoxiaoNeural -> zh-CN)
+    // 如果无法提取，则默认为 zh-CN
+    let lang = "zh-CN";
+    const voiceParts = voiceName.split("-");
+    if (voiceParts.length >= 2) {
+        lang = `${voiceParts[0]}-${voiceParts[1]}`;
+    }
+    
     let slien_str = '';
     if (slien > 0) {
         slien_str = `<break time="${slien}ms" />`
     }
-    return `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" version="1.0" xml:lang="zh-CN"> 
+    return `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" version="1.0" xml:lang="${lang}"> 
                 <voice name="${voiceName}"> 
                     <mstts:express-as style="${style}"  styledegree="2.0" role="default" > 
                         <prosody rate="${rate}" pitch="${pitch}" volume="${volume}">${escapedText}</prosody> 

@@ -4,7 +4,7 @@ import os
 
 # --- 配置项 ---
 # 替换为您部署后的域名，例如: https://your-worker.workers.dev
-BASE_URL = "http://localhost:8787" 
+BASE_URL = "https://tts.conroys.net.au" 
 # 输入我刚才为您生成的 API Key
 API_KEY = "sk-v2f8nm9k4j2p7q5rw3x1z6t8b0y9m5n1"
 
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     print("=== Edge TTS API 鉴权测试 ===")
     
     # 1. 测试 TTS
-    text_to_speech("你好，这是一个带有 API Key 认证的接口调用测试。")
+    text_to_speech("你好啊，这是一个带有 API Key 认证的接口调用测试。")
     
     # 2. 测试 STT (如果本地有文件，填入路径尝试)
     # transcribe_audio("test.mp3")

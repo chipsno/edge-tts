@@ -125,7 +125,8 @@ curl -X POST "https://your-worker.workers.dev/v1/audio/transcriptions" \
 
 ## 🎨 支持的语音
 
-### 女声
+### 🇨🇳 中文 (Chinese)
+#### 女声
 - `zh-CN-XiaoxiaoNeural` - 晓晓 (温柔)
 - `zh-CN-XiaoyiNeural` - 晓伊 (甜美)
 - `zh-CN-XiaochenNeural` - 晓辰 (知性)
@@ -140,7 +141,7 @@ curl -X POST "https://your-worker.workers.dev/v1/audio/transcriptions" \
 - `zh-CN-XiaoyouNeural` - 晓悠 (悠扬)
 - `zh-CN-XiaozhenNeural` - 晓甄 (端庄)
 
-### 男声
+#### 男声
 - `zh-CN-YunxiNeural` - 云希 (清朗)
 - `zh-CN-YunyangNeural` - 云扬 (阳光)
 - `zh-CN-YunjianNeural` - 云健 (稳重)
@@ -149,6 +150,34 @@ curl -X POST "https://your-worker.workers.dev/v1/audio/transcriptions" \
 - `zh-CN-YunxiaNeural` - 云夏 (热情)
 - `zh-CN-YunyeNeural` - 云野 (野性)
 - `zh-CN-YunzeNeural` - 云泽 (深沉)
+
+### 🇺🇸/🇬🇧/🌏 英文 (English)
+#### 女声
+- `en-US-AvaNeural` - Ava (美国·自然)
+- `en-US-EmmaNeural` - Emma (美国·专业)
+- `en-US-JennyNeural` - Jenny (美国·亲切)
+- `en-US-AriaNeural` - Aria (美国·知性)
+- `en-US-MichelleNeural` - Michelle (美国·活泼)
+- `en-GB-SoniaNeural` - Sonia (英国·英伦)
+- `en-GB-LibbyNeural` - Libby (英国·清澈)
+- `en-AU-NatashaNeural` - Natasha (澳洲)
+- `en-CA-ClaraNeural` - Clara (加拿大)
+- `en-IN-NeerjaNeural` - Neerja (印度)
+- `en-IE-EmilyNeural` - Emily (爱尔兰)
+
+#### 男声
+- `en-US-AndrewNeural` - Andrew (美国·自然)
+- `en-US-BrianNeural` - Brian (美国·专业)
+- `en-US-GuyNeural` - Guy (美国·浑厚)
+- `en-US-ChristopherNeural` - Christopher (美国·阳光)
+- `en-US-EricNeural` - Eric (美国·沉稳)
+- `en-US-RogerNeural` - Roger (美国·严肃)
+- `en-GB-RyanNeural` - Ryan (英国·英伦)
+- `en-GB-ThomasNeural` - Thomas (英国·磁性)
+- `en-AU-WilliamNeural` - William (澳洲)
+- `en-CA-LiamNeural` - Liam (加拿大)
+- `en-IN-PrabhatNeural` - Prabhat (印度)
+- `en-IE-ConnorNeural` - Connor (爱尔兰)
 
 ## ⚙️ API 参数
 
