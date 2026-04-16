@@ -254,92 +254,6 @@ const HTML_PAGE = `
             font-weight: 500;
         }
         
-        .wechat-promotion {
-            margin-top: 40px;
-            background: var(--surface-color);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-        }
-        
-        .promotion-header {
-            background: #f1f5f9;
-            padding: 20px 30px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .promotion-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-        
-        .promotion-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-        
-        .promotion-content {
-            padding: 30px;
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 24px;
-            align-items: center;
-        }
-        
-        .qr-code {
-            width: 120px;
-            height: 120px;
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .qr-code img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .promotion-info h3 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 12px;
-        }
-        
-        .promotion-info p {
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-            line-height: 1.6;
-        }
-        
-        .benefits-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .benefits-list li {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            margin-bottom: 8px;
-        }
-        
-        .benefits-list li:before {
-            content: "✓";
-            color: var(--success-color);
-            font-weight: bold;
-            font-size: 1rem;
-        }
         
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -895,15 +809,6 @@ const HTML_PAGE = `
                 gap: 16px;
             }
             
-            .promotion-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: 20px;
-            }
-            
-            .qr-code {
-                margin: 0 auto;
-            }
             
             .input-method-tabs {
                 gap: 2px;
@@ -1377,28 +1282,6 @@ const HTML_PAGE = `
             </div>
         </div>
         
-        <!-- 公众号推广组件 -->
-        <div class="wechat-promotion" id="wechatPromotion" style="display: none;">
-            <div class="promotion-header">
-                <h2 class="promotion-title">🎉 生成成功！喜欢这个工具吗？</h2>
-                <p class="promotion-subtitle">关注我们获取更多AI工具和技术分享</p>
-            </div>
-            <div class="promotion-content">
-                <div class="qr-code">
-                    <img src="https://img.996007.icu/file/img1/a48c4eac2f2a99909da5611c3885726.jpg" alt="微信公众号二维码" />
-                </div>
-                <div class="promotion-info">
-                    <h3>关注「一只会飞的旺旺」公众号</h3>
-                    <p>获取更多实用的AI工具、技术教程和独家资源分享</p>
-                    <ul class="benefits-list">
-                        <li>最新AI工具推荐和使用教程</li>
-                        <li>前沿技术解析和实战案例</li>
-                        <li>独家资源和工具源码分享</li>
-                        <li>技术问题答疑和交流社群</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -1963,12 +1846,6 @@ const HTML_PAGE = `
                 loading.style.display = 'none';
                 success.style.display = 'block';
                 
-                // 显示公众号推广组件
-                setTimeout(() => {
-                    const wechatPromotion = document.getElementById('wechatPromotion');
-                    wechatPromotion.style.display = 'block';
-                    wechatPromotion.classList.add('fade-in');
-                }, 1000);
                 
             } catch (err) {
                 loading.style.display = 'none';
@@ -2030,8 +1907,6 @@ const HTML_PAGE = `
                 transcriptionContainer.style.display = 'block';
             }
 
-            // 隐藏推广组件
-            wechatPromotion.style.display = 'none';
         }
 
         // 初始化音频上传功能
@@ -2203,12 +2078,6 @@ const HTML_PAGE = `
                 transcriptionLoading.style.display = 'none';
                 transcriptionSuccess.style.display = 'block';
                 
-                // 显示公众号推广组件
-                setTimeout(() => {
-                    const wechatPromotion = document.getElementById('wechatPromotion');
-                    wechatPromotion.style.display = 'block';
-                    wechatPromotion.classList.add('fade-in');
-                }, 1000);
                 
             } catch (err) {
                 transcriptionLoading.style.display = 'none';
