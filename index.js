@@ -1774,17 +1774,17 @@ const HTML_PAGE = `
 
             // 初始化表格
             function renderTable() {
-                batchTableBody.innerHTML = voices.map(v => `
-                    <tr id="batch-row-\${v.id}">
-                        <td>\${v.displayName}</td>
-                        <td>\${v.lang === 'zh' ? '🇨🇳 中文' : '🇺🇸 英文'}</td>
-                        <td><span class="status-badge status-waiting" data-i18n="batch.waiting">等待中</span></td>
-                        <td class="batch-actions">
-                            <button class="batch-play-btn" style="display:none" onclick="playBatchAudio('\${v.id}')">▶</button>
-                            <a class="btn-secondary" style="padding:4px 8px; font-size:12px; display:none" id="dl-\${v.id}" download="test-\${v.id}.mp3">📥</a>
-                        </td>
-                    </tr>
-                `).join('');
+                batchTableBody.innerHTML = voices.map(v => 
+                    '<tr id="batch-row-' + v.id + '">' +
+                        '<td>' + v.displayName + '</td>' +
+                        '<td>' + (v.lang === 'zh' ? '🇨🇳 中文' : '🇺🇸 英文') + '</td>' +
+                        '<td><span class="status-badge status-waiting" data-i18n="batch.waiting">等待中</span></td>' +
+                        '<td class="batch-actions">' +
+                            '<button class="batch-play-btn" style="display:none" onclick="playBatchAudio(\'' + v.id + '\')">▶</button>' +
+                            '<a class="btn-secondary" style="padding:4px 8px; font-size:12px; display:none" id="dl-' + v.id + '" download="test-' + v.id + '.mp3">📥</a>' +
+                        '</td>' +
+                    '</tr>'
+                ).join('');
                 applyTranslations();
             }
 
@@ -1800,7 +1800,7 @@ const HTML_PAGE = `
 
                     // 高亮列表行
                     document.querySelectorAll('.batch-table tr').forEach(r => r.classList.remove('active'));
-                    document.getElementById(`batch-row-\${id}`).classList.add('active');
+                    document.getElementById('batch-row-' + id).classList.add('active');
 
                     // 更新标识
                     const voice = voices.find(v => v.id === id);
@@ -1855,7 +1855,7 @@ const HTML_PAGE = `
                         
                         // 显示操作按钮
                         row.querySelector('.batch-play-btn').style.display = 'flex';
-                        const dl = row.querySelector(`#dl-\${voice.id}`);
+                        const dl = row.querySelector('#dl-' + voice.id);
                         dl.style.display = 'inline-flex';
                         dl.href = URL.createObjectURL(blob);
 
