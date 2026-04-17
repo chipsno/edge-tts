@@ -1713,6 +1713,54 @@ const HTML_PAGE = `
             return 'en';
         }
 
+        // --- 缓存系统开始 ---
+        const CACHE_EXPIRATION_MS = 60 * 24 * 60 * 60 * 1000;
+        async function sha1(str) {
+            const buffer = new TextEncoder().encode(str);
+            const digest = await crypto.subtle.digest('SHA-1', buffer);
+            return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        class AudioCache {
+            constructor() { this.dbName = 'VoiceCraftCache'; this.storeName = 'audios'; this.db = null; }
+            async init() {
+                if (this.db) return;
+                return new Promise(resolve => {
+                    const req = indexedDB.open(this.dbName, 1);
+                    req.onupgradeneeded = e => { if (!e.target.result.objectStoreNames.contains(this.storeName)) e.target.result.createObjectStore(this.storeName); };
+                    req.onsuccess = e => { this.db = e.target.result; resolve(); };
+                });
+            }
+            async get(key) {
+                await this.init();
+                return new Promise(resolve => {
+                    const tx = this.db.transaction([this.storeName], 'readonly');
+                    const req = tx.objectStore(this.storeName).get(key);
+                    req.onsuccess = () => { const d = req.result; resolve(d && (Date.now() - d.timestamp < CACHE_EXPIRATION_MS) ? d.blob : null); };
+                    req.onerror = () => resolve(null);
+                });
+            }
+            async set(key, blob) {
+                await this.init();
+                const tx = this.db.transaction([this.storeName], 'readwrite');
+                tx.objectStore(this.storeName).put({ blob, timestamp: Date.now() }, key);
+            }
+        }
+        const audioCache = new AudioCache();
+        async function getVoiceCached(text, voice, speed) {
+            const h = await sha1(text);
+            const k = [h, voice, speed].join('|');
+            const c = await audioCache.get(k);
+            if (c) { console.log('%c[Cache Hit] ' + voice, 'color: #10b981'); return c; }
+            console.log('%c[Cache Miss] ' + voice, 'color: #f59e0b');
+            const res = await fetch('/v1/audio/speech', {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': getStoredApiKey() },
+                body: JSON.stringify({ input: text, voice, speed: parseFloat(speed) })
+            });
+            if (!res.ok) throw new Error('API Error');
+            const blob = await res.blob(); await audioCache.set(k, blob); return blob;
+        }
+        // --- 缓存系统结束 ---
+
         function setLanguage(lang) {
             currentLanguage = lang;
             localStorage.setItem('voicecraft-language', lang);
@@ -1901,22 +1949,8 @@ const HTML_PAGE = `
 
                     try {
                         const text = voice.lang === 'zh' ? zhText : enText;
-                        const response = await fetch('/v1/audio/speech', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'x-api-key': getStoredApiKey()
-                            },
-                            body: JSON.stringify({
-                                input: text,
-                                voice: voice.id,
-                                speed: parseFloat(speed)
-                            })
-                        });
-
-                        if (!response.ok) throw new Error('Failed');
-
-                        const blob = await response.blob();
+                        // 改为使用带缓存的函数
+                        const blob = await getVoiceCached(text, voice.id, speed);
                         audioMap.set(voice.id, blob);
 
                         status.className = 'status-badge status-success';
