@@ -1746,15 +1746,15 @@ const HTML_PAGE = `
             }
         }
         const audioCache = new AudioCache();
-        async function getVoiceCached(text, voice, speed) {
+        async function getVoiceCached(text, voice, speed, pitch = 0, style = 'general') {
             const h = await sha1(text);
-            const k = [h, voice, speed].join('|');
+            const k = [h, voice, speed, pitch, style].join('|');
             const c = await audioCache.get(k);
-            if (c) { console.log('%c[Cache Hit] ' + voice, 'color: #10b981'); return c; }
-            console.log('%c[Cache Miss] ' + voice, 'color: #f59e0b');
+            if (c) { console.log('%c[Cache Hit] ' + voice, 'color: #10b981; font-weight: bold'); return c; }
+            console.log('%c[Cache Miss] ' + voice, 'color: #f59e0b; font-weight: bold');
             const res = await fetch('/v1/audio/speech', {
                 method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': getStoredApiKey() },
-                body: JSON.stringify({ input: text, voice, speed: parseFloat(speed) })
+                body: JSON.stringify({ input: text, voice, speed: parseFloat(speed), pitch, style })
             });
             if (!res.ok) throw new Error('API Error');
             const blob = await res.blob(); await audioCache.set(k, blob); return blob;
@@ -2178,55 +2178,16 @@ const HTML_PAGE = `
                         progressInfo.textContent = '文本长度: ' + textLength + ' 字符';
                     }
                     
-                    response = await fetch('/v1/audio/speech', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'x-api-key': getStoredApiKey()
-                        },
-                        body: JSON.stringify({
-                            input: text,
-                            voice: voice,
-                            speed: parseFloat(speed),
-                            pitch: pitch,
-                            style: style
-                        })
-                    });
-                } else {
-                    // 文件上传
-                    loadingText.textContent = '正在处理上传的文件...';
-                    progressInfo.textContent = '文件: ' + selectedFile.name + ' (' + formatFileSize(selectedFile.size) + ')';
+                    // 直接获取音频 Blob (带缓存)
+                    const audioBlob = await getVoiceCached(text, voice, speed, pitch, style);
+                    const audioUrl = URL.createObjectURL(audioBlob);
                     
-                    const formData = new FormData();
-                    formData.append('file', selectedFile);
-                    formData.append('voice', voice);
-                    formData.append('speed', speed);
-                    formData.append('pitch', pitch);
-                    formData.append('style', style);
+                    // 显示音频播放器
+                    const audioPlayer = document.getElementById('audioPlayer');
+                    const downloadBtn = document.getElementById('downloadBtn');
                     
-                    response = await fetch('/v1/audio/speech', {
-                        method: 'POST',
-                        headers: {
-                            'x-api-key': getStoredApiKey()
-                        },
-                        body: formData
-                    });
-                }
-                
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error?.message || '生成失败');
-                }
-                
-                const audioBlob = await response.blob();
-                const audioUrl = URL.createObjectURL(audioBlob);
-                
-                // 显示音频播放器
-                const audioPlayer = document.getElementById('audioPlayer');
-                const downloadBtn = document.getElementById('downloadBtn');
-                
-                audioPlayer.src = audioUrl;
-                downloadBtn.href = audioUrl;
+                    audioPlayer.src = audioUrl;
+                    downloadBtn.href = audioUrl;
                 
                 // 显示语音标识
                 if (currentInputMethod === 'text') {
