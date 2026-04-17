@@ -561,7 +561,14 @@ const HTML_PAGE = `
             padding: 12px 16px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
         }
+
+        /* 锁定列宽方案 */
+        .batch-table th:nth-child(1), .batch-table td:nth-child(1) { width: auto; }
+        .batch-table th:nth-child(2), .batch-table td:nth-child(2) { width: 100px; text-align: center; }
+        .batch-table th:nth-child(3), .batch-table td:nth-child(3) { width: 120px; text-align: center; }
+        .batch-table th:nth-child(4), .batch-table td:nth-child(4) { width: 100px; text-align: center; }
 
         .batch-table th {
             background: var(--background-color);
@@ -577,7 +584,9 @@ const HTML_PAGE = `
         .status-badge {
             display: inline-flex;
             align-items: center;
-            padding: 2px 8px;
+            justify-content: center;
+            padding: 2px 0;
+            width: 80px;
             border-radius: 99px;
             font-size: 0.75rem;
             font-weight: 600;
@@ -709,6 +718,7 @@ const HTML_PAGE = `
         .batch-actions {
             display: flex;
             gap: 8px;
+            justify-content: center;
         }
 
         .batch-play-btn {
