@@ -1781,7 +1781,7 @@ const HTML_PAGE = `
                             '<td>' + (v.lang === "zh" ? "🇨🇳 中文" : "🇺🇸 英文") + '</td>' +
                             '<td><span class="status-badge status-waiting" data-i18n="batch.waiting">等待中</span></td>' +
                             '<td class="batch-actions">' +
-                                '<button class="batch-play-btn" style="display:none" onclick="playBatchAudio(\'' + v.id + '\')">▶</button>' +
+                                '<button class="batch-play-btn" style="display:none" data-voice-id="' + v.id + '">▶</button>' +
                                 '<a class="btn-secondary" style="padding:4px 8px; font-size:12px; display:none" id="dl-' + v.id + '" download="test-' + v.id + '.mp3">📥</a>' +
                             '</td>' +
                         '</tr>';
@@ -1789,6 +1789,15 @@ const HTML_PAGE = `
                 batchTableBody.innerHTML = html;
                 applyTranslations();
             }
+
+            // 使用事件代理处理点击
+            batchTableBody.addEventListener('click', function(e) {
+                const btn = e.target.closest('.batch-play-btn');
+                if (btn) {
+                    const voiceId = btn.getAttribute('data-voice-id');
+                    if (voiceId) playBatchAudio(voiceId);
+                }
+            });
 
             renderTable();
 
