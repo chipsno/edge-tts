@@ -592,6 +592,38 @@ const HTML_PAGE = `
             font-weight: 600;
         }
 
+        .voice-name-copy {
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .voice-name-copy:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        .copy-feedback {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-color);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            pointer-events: none;
+            animation: fadeInOut 1s forwards;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, 0); }
+            20% { opacity: 1; transform: translate(-50%, -5px); }
+            80% { opacity: 1; transform: translate(-50%, -5px); }
+            100% { opacity: 0; transform: translate(-50%, -10px); }
+        }
+
         .status-waiting { background: #f3f4f6; color: #6b7280; }
         .status-processing { background: #dbeafe; color: #1e40af; animation: pulse 2s infinite; }
         .status-success { background: #dcfce7; color: #166534; }
@@ -1787,7 +1819,7 @@ const HTML_PAGE = `
                 let html = '';
                 voices.forEach(function(v) {
                     html += '<tr id="batch-row-' + v.id + '">' +
-                            '<td>' + v.displayName + '</td>' +
+                            '<td class="voice-name-copy" data-voice-id="' + v.id + '">' + v.displayName + '</td>' +
                             '<td>' + (v.lang === "zh" ? "🇨🇳 中文" : "🇺🇸 英文") + '</td>' +
                             '<td><span class="status-badge status-waiting" data-i18n="batch.waiting">等待中</span></td>' +
                             '<td class="batch-actions">' +
@@ -1802,10 +1834,26 @@ const HTML_PAGE = `
 
             // 使用事件代理处理点击
             batchTableBody.addEventListener('click', function(e) {
+                // 处理播放按钮点击
                 const btn = e.target.closest('.batch-play-btn');
                 if (btn) {
                     const voiceId = btn.getAttribute('data-voice-id');
                     if (voiceId) playBatchAudio(voiceId);
+                    return;
+                }
+
+                // 处理 Voice Name 点击复制
+                const nameCol = e.target.closest('.voice-name-copy');
+                if (nameCol) {
+                    const voiceId = nameCol.getAttribute('data-voice-id');
+                    navigator.clipboard.writeText(voiceId).then(() => {
+                        // 添加反馈动画
+                        const feedback = document.createElement('span');
+                        feedback.className = 'copy-feedback';
+                        feedback.textContent = 'Copied!';
+                        nameCol.appendChild(feedback);
+                        setTimeout(() => feedback.remove(), 1000);
+                    });
                 }
             });
 
