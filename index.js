@@ -783,10 +783,11 @@ const HTML_PAGE = `
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.2s;
+            transition: all 0.2s;
         }
 
-        .batch-play-btn:hover { transform: scale(1.1); }
+        .batch-play-btn:hover:not(:disabled) { transform: scale(1.1); }
+        .batch-play-btn:disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; opacity: 0.7; }
 
         /* API Key 配置样式 */
         .api-config {
@@ -1060,7 +1061,8 @@ const HTML_PAGE = `
             }
             .status-badge { padding: 3px 8px; font-size: 11px; border-radius: 12px; display: inline-block; font-weight: 500; }
             .batch-actions { display: flex; justify-content: flex-end; gap: 6px; }
-            .batch-play-btn { background: var(--primary-color); color: white; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+            .batch-play-btn { background: var(--primary-color); color: white; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+            .batch-play-btn:disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
         </style>
 </head>
 <body>
@@ -1914,8 +1916,7 @@ const HTML_PAGE = `
                             '</td>' +
                             '<td><span class="status-badge status-waiting" data-i18n="batch.waiting">等待中</span></td>' +
                             '<td class="batch-actions">' +
-                                '<button class="batch-play-btn" style="display:none" data-voice-id="' + v.id + '">▶</button>' +
-                                '<a class="btn-secondary" style="padding:4px 6px; font-size:12px; display:none" id="dl-' + v.id + '" download="test-' + v.id + '.mp3">📥</a>' +
+                                '<button class="batch-play-btn" disabled data-voice-id="' + v.id + '" title="Play">▶</button>' +
                             '</td>' +
                         '</tr>';
                 });
@@ -1998,12 +1999,9 @@ const HTML_PAGE = `
 
                         status.className = 'status-badge status-success';
                         status.textContent = translations[currentLanguage]['batch.success'];
-                        
-                        // 显示操作按钮
-                        row.querySelector('.batch-play-btn').style.display = 'flex';
-                        const dl = row.querySelector('#dl-' + voice.id);
-                        dl.style.display = 'inline-flex';
-                        dl.href = URL.createObjectURL(blob);
+                        // 启用播放按钮
+                        const playBtn = row.querySelector('.batch-play-btn');
+                        playBtn.disabled = false;
 
                     } catch (e) {
                         status.className = 'status-badge status-error';
