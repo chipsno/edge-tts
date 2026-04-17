@@ -533,6 +533,81 @@ const HTML_PAGE = `
             justify-content: center;
         }
         
+        /* 批量测试界面样式 */
+        .batch-container {
+            background: var(--surface-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .batch-table-container {
+            overflow-x: auto;
+            margin-top: 24px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .batch-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .batch-table th, .batch-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .batch-table th {
+            background: var(--background-color);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .batch-table tr.active {
+            background: rgba(37, 99, 235, 0.05);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-waiting { background: #f3f4f6; color: #6b7280; }
+        .status-processing { background: #dbeafe; color: #1e40af; animation: pulse 2s infinite; }
+        .status-success { background: #dcfce7; color: #166534; }
+        .status-error { background: #fee2e2; color: #991b1b; }
+
+        .voice-ident-card {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            margin-top: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
         /* 语音转录界面样式 */
         .transcription-container {
             background: var(--surface-color);
@@ -630,6 +705,27 @@ const HTML_PAGE = `
             flex: 1;
             min-width: 140px;
         }
+
+        .batch-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .batch-play-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .batch-play-btn:hover { transform: scale(1.1); }
 
         /* API Key 配置样式 */
         .api-config {
@@ -993,16 +1089,14 @@ const HTML_PAGE = `
             <button type="button" class="mode-btn" id="transcriptionMode">
                 <span class="mode-icon">
                     <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M9 9m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
-                        <path d="M9 17v4"/>
-                        <path d="M12 13a3 3 0 0 0 3 -3"/>
-                        <path d="M15 9.5v-3a3 3 0 0 0 -3 -3h-1"/>
-                        <path d="M19 8v8"/>
-                        <path d="M17 9v6"/>
-                        <path d="M21 9v6"/>
+                        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
                     </svg>
                 </span>
                 <span data-i18n="mode.transcription">Speech to Text</span>
+            </button>
+            <button type="button" class="mode-btn" id="batchMode">
+                <span class="mode-icon">🚀</span>
+                <span data-i18n="mode.batch">Batch Testing</span>
             </button>
         </div>
         
@@ -1181,13 +1275,71 @@ const HTML_PAGE = `
                     
                     <div id="success" style="display: none;">
                         <audio id="audioPlayer" class="audio-player" controls></audio>
-                        <a id="downloadBtn" class="btn-secondary" download="speech.mp3">
-                            <span>📥</span>
-                            <span>下载音频文件</span>
-                        </a>
+                        <div id="voiceIdent" class="voice-ident-card" style="display: none;">
+                            <span>🔊</span>
+                            <span id="voiceIdentText"></span>
+                        </div>
+                        <div style="margin-top: 16px;">
+                            <a id="downloadBtn" class="btn-secondary" download="speech.mp3">
+                                <span>📥</span>
+                                <span data-i18n="tts.download">下载音频文件</span>
+                            </a>
+                        </div>
                     </div>
                     
                     <div id="error" class="error-message" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 批量测试界面 -->
+        <div class="batch-container" id="batchContainer" style="display: none;">
+            <div class="form-container">
+                <div class="controls-grid">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="batch.zhText">中文测试文本</label>
+                        <input type="text" class="form-input" id="batchZhText" value="你好，这是一个批量测试。">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="batch.enText">英文测试文本</label>
+                        <input type="text" class="form-input" id="batchEnText" value="Hello, this is a batch test.">
+                    </div>
+                </div>
+
+                <div class="controls-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="batchSpeed" data-i18n="tts.speed">语速调节</label>
+                        <select class="form-select" id="batchSpeed">
+                            <option value="1.0" selected>⚡ 正常</option>
+                            <option value="0.75">🚶 慢速</option>
+                            <option value="1.25">🏃 快速</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="batch.interval">请求间隔 (ms)</label>
+                        <input type="number" class="form-input" id="batchInterval" value="1000" min="500" step="100">
+                    </div>
+                </div>
+
+                <button type="button" class="btn-primary" id="startBatchBtn">
+                    <span>🚀</span>
+                    <span data-i18n="batch.start">开始批量生成</span>
+                </button>
+
+                <div class="batch-table-container">
+                    <table class="batch-table" id="batchTable">
+                        <thead>
+                            <tr>
+                                <th data-i18n="batch.voiceName">语音名称</th>
+                                <th data-i18n="batch.lang">语种</th>
+                                <th data-i18n="batch.status">状态</th>
+                                <th data-i18n="batch.action">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="batchTableBody">
+                            <!-- 动态插入 -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -1313,13 +1465,21 @@ const HTML_PAGE = `
                 'header.feature2': 'Lightning Fast',
                 'header.feature3': 'Completely Free',
                 'header.feature4': 'Download Support',
-                'mode.tts': 'Text to Speech',
-                'mode.transcription': 'Speech to Text',
-                'api.config': 'API Key',
-                'api.modalTitle': 'API Configuration',
-                'api.label': 'Access Key (API_KEY)',
-                'api.hint': 'Required for API access. Stored in browser.',
-                'api.save': 'Save Key'
+                'api.save': 'Save Key',
+                'mode.batch': 'Batch Testing',
+                'batch.zhText': 'Chinese Test Text',
+                'batch.enText': 'English Test Text',
+                'batch.interval': 'Interval (ms)',
+                'batch.start': 'Start Batch Generation',
+                'batch.voiceName': 'Voice Name',
+                'batch.lang': 'Language',
+                'batch.status': 'Status',
+                'batch.action': 'Action',
+                'batch.waiting': 'Waiting',
+                'batch.processing': 'Processing',
+                'batch.success': 'Success',
+                'batch.error': 'Error',
+                'tts.download': 'Download Audio'
             },
             zh: {
                 'page.title': 'VoiceCraft - AI驱动的语音处理平台',
@@ -1346,7 +1506,21 @@ const HTML_PAGE = `
                 'api.modalTitle': 'API 访问配置',
                 'api.label': '访问密钥 (API_KEY)',
                 'api.hint': '防卫任意调用，密钥保存在本地浏览器中。',
-                'api.save': '保存配置'
+                'api.save': '保存配置',
+                'mode.batch': '批量测试',
+                'batch.zhText': '中文测试文本',
+                'batch.enText': '英文测试文本',
+                'batch.interval': '请求间隔 (ms)',
+                'batch.start': '开始批量生成',
+                'batch.voiceName': '语音名称',
+                'batch.lang': '语种',
+                'batch.status': '状态',
+                'batch.action': '操作',
+                'batch.waiting': '等待中',
+                'batch.processing': '生成中',
+                'batch.success': '成功',
+                'batch.error': '失败',
+                'tts.download': '下载音频文件'
             },
             ja: {
                 'page.title': 'VoiceCraft - AI音声処理プラットフォーム',
@@ -1574,7 +1748,131 @@ const HTML_PAGE = `
             initializeTokenConfig();
             initializeLanguageSwitcher();
             initializeApiKeyConfig();
+            initializeBatchMode();
         });
+
+        // 批量语音生成逻辑
+        function initializeBatchMode() {
+            const startBtn = document.getElementById('startBatchBtn');
+            const batchTableBody = document.getElementById('batchTableBody');
+            let isRunning = false;
+            let audioMap = new Map(); // Store blobs
+
+            // 从语音选择框解析语音列表
+            const voiceSelect = document.getElementById('voice');
+            const voices = [];
+            Array.from(voiceSelect.options).forEach(opt => {
+                if (opt.value) {
+                    voices.push({
+                        id: opt.value,
+                        name: opt.textContent.split(' (')[0],
+                        displayName: opt.textContent,
+                        lang: opt.value.startsWith('zh-') ? 'zh' : 'en'
+                    });
+                }
+            });
+
+            // 初始化表格
+            function renderTable() {
+                batchTableBody.innerHTML = voices.map(v => `
+                    <tr id="batch-row-${v.id}">
+                        <td>${v.displayName}</td>
+                        <td>${v.lang === 'zh' ? '🇨🇳 中文' : '🇺🇸 英文'}</td>
+                        <td><span class="status-badge status-waiting" data-i18n="batch.waiting">等待中</span></td>
+                        <td class="batch-actions">
+                            <button class="batch-play-btn" style="display:none" onclick="playBatchAudio('${v.id}')">▶</button>
+                            <a class="btn-secondary" style="padding:4px 8px; font-size:12px; display:none" id="dl-${v.id}" download="test-${v.id}.mp3">📥</a>
+                        </td>
+                    </tr>
+                `).join('');
+                applyTranslations();
+            }
+
+            renderTable();
+
+            window.playBatchAudio = function(id) {
+                const blob = audioMap.get(id);
+                if (blob) {
+                    const url = URL.createObjectURL(blob);
+                    const audioPlayer = document.getElementById('audioPlayer');
+                    const voiceIdent = document.getElementById('voiceIdent');
+                    const voiceIdentText = document.getElementById('voiceIdentText');
+
+                    // 高亮列表行
+                    document.querySelectorAll('.batch-table tr').forEach(r => r.classList.remove('active'));
+                    document.getElementById(`batch-row-${id}`).classList.add('active');
+
+                    // 更新标识
+                    const voice = voices.find(v => v.id === id);
+                    voiceIdent.style.display = 'inline-flex';
+                    voiceIdentText.textContent = voice.displayName;
+
+                    audioPlayer.src = url;
+                    audioPlayer.play();
+                }
+            };
+
+            startBtn.addEventListener('click', async () => {
+                if (isRunning) return;
+                isRunning = true;
+                startBtn.disabled = true;
+                audioMap.clear();
+
+                const zhText = document.getElementById('batchZhText').value;
+                const enText = document.getElementById('batchEnText').value;
+                const speed = document.getElementById('batchSpeed').value;
+                const interval = parseInt(document.getElementById('batchInterval').value) || 1000;
+
+                for (const voice of voices) {
+                    const row = document.getElementById(`batch-row-${voice.id}`);
+                    const status = row.querySelector('.status-badge');
+                    
+                    status.className = 'status-badge status-processing';
+                    status.textContent = translations[currentLanguage]['batch.processing'];
+
+                    try {
+                        const text = voice.lang === 'zh' ? zhText : enText;
+                        const response = await fetch('/v1/audio/speech', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'x-api-key': getStoredApiKey()
+                            },
+                            body: JSON.stringify({
+                                input: text,
+                                voice: voice.id,
+                                speed: parseFloat(speed)
+                            })
+                        });
+
+                        if (!response.ok) throw new Error('Failed');
+
+                        const blob = await response.blob();
+                        audioMap.set(voice.id, blob);
+
+                        status.className = 'status-badge status-success';
+                        status.textContent = translations[currentLanguage]['batch.success'];
+                        
+                        // 显示操作按钮
+                        row.querySelector('.batch-play-btn').style.display = 'flex';
+                        const dl = row.querySelector(`#dl-${voice.id}`);
+                        dl.style.display = 'inline-flex';
+                        dl.href = URL.createObjectURL(blob);
+
+                    } catch (e) {
+                        status.className = 'status-badge status-error';
+                        status.textContent = translations[currentLanguage]['batch.error'];
+                    }
+
+                    // 冷却间隔
+                    await new Promise(r => setTimeout(r, interval));
+                }
+
+                isRunning = false;
+                startBtn.disabled = false;
+                alert(currentLanguage === 'zh' ? '批量生成任务已完成！' : 'Batch generation completed!');
+            });
+        }
 
         // 初始化 API Key 配置
         function initializeApiKeyConfig() {
@@ -1741,30 +2039,14 @@ const HTML_PAGE = `
             const voice = document.getElementById('voice').value;
             const speed = document.getElementById('speed').value;
             const pitch = document.getElementById('pitch').value;
-            const style = document.getElementById('style').value;
-            
-            const generateBtn = document.getElementById('generateBtn');
-            const resultContainer = document.getElementById('result');
-            const loading = document.getElementById('loading');
-            const success = document.getElementById('success');
-            const error = document.getElementById('error');
-            
-            // 验证输入
-            if (currentInputMethod === 'text') {
-                const text = document.getElementById('text').value;
-                if (!text.trim()) {
-                    alert('请输入要转换的文本内容');
-                    return;
-                }
-            } else if (currentInputMethod === 'file') {
-                if (!selectedFile) {
-                    alert('请选择要上传的txt文件');
-                    return;
-                }
-            }
+            const voiceIdent = document.getElementById('voiceIdent');
+            const voiceIdentText = document.getElementById('voiceIdentText');
+            const voiceSelect = document.getElementById('voice');
+            const selectedVoiceName = voiceSelect.options[voiceSelect.selectedIndex].textContent;
             
             // 重置状态
             resultContainer.style.display = 'block';
+            voiceIdent.style.display = 'none';
             loading.style.display = 'block';
             success.style.display = 'none';
             error.style.display = 'none';
@@ -1843,6 +2125,12 @@ const HTML_PAGE = `
                 audioPlayer.src = audioUrl;
                 downloadBtn.href = audioUrl;
                 
+                // 显示语音标识
+                if (currentInputMethod === 'text') {
+                    voiceIdent.style.display = 'inline-flex';
+                    voiceIdentText.textContent = selectedVoiceName;
+                }
+                
                 loading.style.display = 'none';
                 success.style.display = 'block';
                 
@@ -1869,10 +2157,11 @@ const HTML_PAGE = `
 
         // 初始化模式切换器
         function initializeModeSwitcher() {
-            const ttsMode = document.getElementById('ttsMode');
             const transcriptionMode = document.getElementById('transcriptionMode');
+            const batchMode = document.getElementById('batchMode');
             const mainContent = document.querySelector('.main-content');
             const transcriptionContainer = document.getElementById('transcriptionContainer');
+            const batchContainer = document.getElementById('batchContainer');
 
             ttsMode.addEventListener('click', function() {
                 switchMode('tts');
@@ -1881,32 +2170,37 @@ const HTML_PAGE = `
             transcriptionMode.addEventListener('click', function() {
                 switchMode('transcription');
             });
+
+            batchMode.addEventListener('click', function() {
+                switchMode('batch');
+            });
         }
 
         // 切换功能模式
         function switchMode(mode) {
             const ttsMode = document.getElementById('ttsMode');
             const transcriptionMode = document.getElementById('transcriptionMode');
+            const batchMode = document.getElementById('batchMode');
             const mainContent = document.querySelector('.main-content');
             const transcriptionContainer = document.getElementById('transcriptionContainer');
-            const wechatPromotion = document.getElementById('wechatPromotion');
+            const batchContainer = document.getElementById('batchContainer');
 
             currentMode = mode;
 
-            if (mode === 'tts') {
-                // 切换到TTS模式
-                ttsMode.classList.add('active');
-                transcriptionMode.classList.remove('active');
-                mainContent.style.display = 'block';
-                transcriptionContainer.style.display = 'none';
-            } else {
-                // 切换到语音转录模式
-                transcriptionMode.classList.add('active');
-                ttsMode.classList.remove('active');
-                mainContent.style.display = 'none';
-                transcriptionContainer.style.display = 'block';
-            }
+            // 重置所有模式按钮和容器
+            [ttsMode, transcriptionMode, batchMode].forEach(btn => btn.classList.remove('active'));
+            [mainContent, transcriptionContainer, batchContainer].forEach(div => div.style.display = 'none');
 
+            if (mode === 'tts') {
+                ttsMode.classList.add('active');
+                mainContent.style.display = 'block';
+            } else if (mode === 'transcription') {
+                transcriptionMode.classList.add('active');
+                transcriptionContainer.style.display = 'block';
+            } else if (mode === 'batch') {
+                batchMode.classList.add('active');
+                batchContainer.style.display = 'block';
+            }
         }
 
         // 初始化音频上传功能
