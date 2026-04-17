@@ -1824,7 +1824,7 @@ const HTML_PAGE = `
                 const interval = parseInt(document.getElementById('batchInterval').value) || 1000;
 
                 for (const voice of voices) {
-                    const row = document.getElementById(`batch-row-${voice.id}`);
+                    const row = document.getElementById('batch-row-' + voice.id);
                     const status = row.querySelector('.status-badge');
                     
                     status.className = 'status-badge status-processing';
