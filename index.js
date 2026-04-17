@@ -629,6 +629,25 @@ const HTML_PAGE = `
         .status-success { background: #dcfce7; color: #166534; }
         .status-error { background: #fee2e2; color: #991b1b; }
 
+        /* 批量表格紧凑布局 */
+        .batch-table { table-layout: fixed; width: 100%; border-collapse: collapse; }
+        .batch-table th, .batch-table td { 
+            padding: 8px 4px; font-size: 13px; white-space: nowrap; 
+            overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid var(--border-color);
+        }
+        .batch-table th:nth-child(1), .batch-table td:nth-child(1) { width: 60%; }
+        .batch-table th:nth-child(2), .batch-table td:nth-child(2) { width: 20%; }
+        .batch-table th:nth-child(3), .batch-table td:nth-child(3) { width: 20%; text-align: right; }
+        
+        .voice-meta-wrapper { display: flex; align-items: center; gap: 4px; width: 100%; overflow: hidden; }
+        .voice-name-copy { flex: 1; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+        .lang-tag { 
+            font-size: 9px; background: rgba(99, 102, 241, 0.1); color: #6366f1; 
+            padding: 1px 3px; border-radius: 3px; font-weight: bold; flex-shrink: 0; 
+        }
+        .status-badge { padding: 2px 6px; font-size: 11px; border-radius: 10px; display: inline-block; }
+        .batch-actions { display: flex; justify-content: flex-end; gap: 4px; }
+
         .voice-ident-card {
             background: var(--primary-color);
             color: white;
@@ -1021,8 +1040,28 @@ const HTML_PAGE = `
             .result-actions .btn-secondary {
                 min-width: auto;
             }
-        }
-    </style>
+            /* 批量表格紧凑布局优化 */
+            .batch-table { table-layout: fixed; width: 100%; border-collapse: collapse; margin-top: 10px; }
+            .batch-table th, .batch-table td { 
+                padding: 10px 6px; font-size: 13px; white-space: nowrap; 
+                overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid var(--border-color);
+            }
+            .batch-table th:nth-child(1), .batch-table td:nth-child(1) { width: 60%; }
+            .batch-table th:nth-child(2), .batch-table td:nth-child(2) { width: 22%; text-align: center; }
+            .batch-table th:nth-child(3), .batch-table td:nth-child(3) { width: 18%; text-align: right; }
+            
+            .voice-meta-wrapper { display: flex; align-items: center; gap: 6px; width: 100%; overflow: hidden; }
+            .voice-name-copy { flex: 1; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--text-primary); }
+            .voice-name-copy:hover { color: var(--primary-color); text-decoration: underline; }
+            .lang-tag { 
+                font-size: 9px; background: rgba(99, 102, 241, 0.1); color: #6366f1; 
+                padding: 1px 4px; border-radius: 3px; font-weight: bold; flex-shrink: 0; 
+                border: 1px solid rgba(99, 102, 241, 0.2); line-height: 1;
+            }
+            .status-badge { padding: 3px 8px; font-size: 11px; border-radius: 12px; display: inline-block; font-weight: 500; }
+            .batch-actions { display: flex; justify-content: flex-end; gap: 6px; }
+            .batch-play-btn { background: var(--primary-color); color: white; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        </style>
 </head>
 <body>
     <!-- 语言切换器 -->
@@ -1373,9 +1412,8 @@ const HTML_PAGE = `
                         <thead>
                             <tr>
                                 <th data-i18n="batch.voiceName">语音名称</th>
-                                <th data-i18n="batch.lang">语种</th>
                                 <th data-i18n="batch.status">状态</th>
-                                <th data-i18n="batch.action">操作</th>
+                                <th data-i18n="batch.action" style="text-align:right">操作</th>
                             </tr>
                         </thead>
                         <tbody id="batchTableBody">
@@ -1866,13 +1904,18 @@ const HTML_PAGE = `
             function renderTable() {
                 let html = '';
                 voices.forEach(function(v) {
+                    const langIcon = v.lang === "zh" ? "ZH" : "EN";
                     html += '<tr id="batch-row-' + v.id + '">' +
-                            '<td class="voice-name-copy" data-voice-id="' + v.id + '">' + v.displayName + '</td>' +
-                            '<td>' + (v.lang === "zh" ? "🇨🇳 中文" : "🇺🇸 英文") + '</td>' +
+                            '<td>' +
+                                '<div class="voice-meta-wrapper">' +
+                                    '<span class="voice-name-copy" data-voice-id="' + v.id + '">' + v.displayName + '</span>' +
+                                    '<span class="lang-tag">' + langIcon + '</span>' +
+                                '</div>' +
+                            '</td>' +
                             '<td><span class="status-badge status-waiting" data-i18n="batch.waiting">等待中</span></td>' +
                             '<td class="batch-actions">' +
                                 '<button class="batch-play-btn" style="display:none" data-voice-id="' + v.id + '">▶</button>' +
-                                '<a class="btn-secondary" style="padding:4px 8px; font-size:12px; display:none" id="dl-' + v.id + '" download="test-' + v.id + '.mp3">📥</a>' +
+                                '<a class="btn-secondary" style="padding:4px 6px; font-size:12px; display:none" id="dl-' + v.id + '" download="test-' + v.id + '.mp3">📥</a>' +
                             '</td>' +
                         '</tr>';
                 });
