@@ -2231,6 +2231,7 @@ const HTML_PAGE = `
                     
                     audioPlayer.src = audioUrl;
                     downloadBtn.href = audioUrl;
+                }
                 
                 // 显示语音标识
                 if (currentInputMethod === 'text') {
