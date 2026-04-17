@@ -635,9 +635,8 @@ const HTML_PAGE = `
             padding: 8px 4px; font-size: 13px; white-space: nowrap; 
             overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid var(--border-color);
         }
-        .batch-table th:nth-child(1), .batch-table td:nth-child(1) { width: 60%; }
-        .batch-table th:nth-child(2), .batch-table td:nth-child(2) { width: 20%; }
-        .batch-table th:nth-child(3), .batch-table td:nth-child(3) { width: 20%; text-align: right; }
+        .batch-table th:nth-child(1), .batch-table td:nth-child(1) { width: 75%; }
+        .batch-table th:nth-child(2), .batch-table td:nth-child(2) { width: 25%; text-align: right; }
         
         .voice-meta-wrapper { display: flex; align-items: center; gap: 4px; width: 100%; overflow: hidden; }
         .voice-name-copy { flex: 1; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
@@ -1047,9 +1046,8 @@ const HTML_PAGE = `
                 padding: 10px 6px; font-size: 13px; white-space: nowrap; 
                 overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid var(--border-color);
             }
-            .batch-table th:nth-child(1), .batch-table td:nth-child(1) { width: 60%; }
-            .batch-table th:nth-child(2), .batch-table td:nth-child(2) { width: 22%; text-align: center; }
-            .batch-table th:nth-child(3), .batch-table td:nth-child(3) { width: 18%; text-align: right; }
+            .batch-table th:nth-child(1), .batch-table td:nth-child(1) { width: 75%; }
+            .batch-table th:nth-child(2), .batch-table td:nth-child(2) { width: 25%; text-align: right; }
             
             .voice-meta-wrapper { display: flex; align-items: center; gap: 6px; width: 100%; overflow: hidden; }
             .voice-name-copy { flex: 1; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--text-primary); }
@@ -1414,8 +1412,7 @@ const HTML_PAGE = `
                         <thead>
                             <tr>
                                 <th data-i18n="batch.voiceName">语音名称</th>
-                                <th data-i18n="batch.status">状态</th>
-                                <th data-i18n="batch.action" style="text-align:right">操作</th>
+                                <th data-i18n="batch.status" style="text-align:right">状态</th>
                             </tr>
                         </thead>
                         <tbody id="batchTableBody">
@@ -1914,10 +1911,7 @@ const HTML_PAGE = `
                                     '<span class="lang-tag">' + langIcon + '</span>' +
                                 '</div>' +
                             '</td>' +
-                            '<td><span class="status-badge status-waiting" data-i18n="batch.waiting">等待中</span></td>' +
-                            '<td class="batch-actions">' +
-                                '<button class="batch-play-btn" disabled data-voice-id="' + v.id + '" title="Play">▶</button>' +
-                            '</td>' +
+                            '<td class="batch-status-cell" style="text-align:right"><span class="status-badge status-waiting" data-i18n="batch.waiting">等待中</span></td>' +
                         '</tr>';
                 });
                 batchTableBody.innerHTML = html;
@@ -1977,6 +1971,7 @@ const HTML_PAGE = `
                 if (isRunning) return;
                 isRunning = true;
                 startBtn.disabled = true;
+                renderTable(); // 重置表格状态
                 audioMap.clear();
 
                 const zhText = document.getElementById('batchZhText').value;
@@ -1997,11 +1992,9 @@ const HTML_PAGE = `
                         const blob = await getVoiceCached(text, voice.id, speed);
                         audioMap.set(voice.id, blob);
 
-                        status.className = 'status-badge status-success';
-                        status.textContent = translations[currentLanguage]['batch.success'];
-                        // 启用播放按钮
-                        const playBtn = row.querySelector('.batch-play-btn');
-                        playBtn.disabled = false;
+                        // 成功后，将状态单元格内容替换为播放按钮
+                        const statusCell = row.querySelector('.batch-status-cell');
+                        statusCell.innerHTML = '<button class="batch-play-btn" data-voice-id="' + voice.id + '" title="Play" style="margin-left:auto">▶</button>';
 
                     } catch (e) {
                         status.className = 'status-badge status-error';
